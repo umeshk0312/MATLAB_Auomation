@@ -3,6 +3,7 @@
     {
       "type": "web",
       "name": "uk-career-job-hub",
+      "rootDir": "UK-Career-Job-Hub-Hosting",
       "runtime": "node",
       "plan": "free",
       "buildCommand": "npm ci --prefix job_hub_backend",
