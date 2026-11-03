@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Career Job Board Search Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333333; margin: 0; padding: 20px; line-height: 1.25; }
+        .container { max-width: 950px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        h1 { color: #1a365d; text-align: center; margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: #555555; margin-bottom: 30px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 25px; }
+        input[type="text"] { flex: 1; padding: 12px 15px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 6px; outline: none; }
+        input[type="text"]:focus { border-color: #3182ce; }
+        button { background-color: #3182ce; color: #ffffff; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        button:hover { background-color: #2b6cb0; }
+        .tags-container { margin-bottom: 25px; }
+        .tags-title { font-size: 14px; font-weight: bold; color: #4a5568; margin-bottom: 8px; }
+        .tag { display: inline-block; background-color: #edf2f7; color: #2d3748; padding: 6px 12px; border-radius: 20px; font-size: 13px; margin-right: 6px; margin-bottom: 8px; cursor: pointer; border: 1px solid #e2e8f0; }
+        .tag:hover { background-color: #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f7fafc; color: #2d3748; font-weight: bold; }
+        tr:hover { background-color: #f8fafc; }
+        a.job-link { color: #3182ce; text-decoration: none; font-weight: 500; word-break: break-all; }
+        a.job-link:hover { text-decoration: underline; }
+        a.discovery-link { display: block; margin-top: 8px; color: #3182ce; font-size: 13px; }
+        .instructions { background-color: #ebf8ff; border-left: 4px solid #3182ce; padding: 12px 15px; border-radius: 0 6px 6px 0; margin-bottom: 25px; font-size: 14px; color: #2b6cb0; }
+        .search-box input { min-width: 0; }
+        .search-box { flex-wrap: wrap; margin-bottom: 15px; }
+        .search-box label { width: 100%; font-size: 14px; font-weight: bold; }
+        .tag { font-weight: normal; }
+        .secondary { background: #edf2f7; color: #2d3748; }
+        .secondary:hover { background: #e2e8f0; }
+        .coverage-note { font-size: 14px; color: #555555; margin: 16px 0; }
+        .table-scroll { overflow-x: auto; }
+        .table-scroll table { min-width: 570px; }
+        #liveResults { margin: 24px 0; }
+        #liveResults h2 { font-size: 21px; margin-bottom: 8px; }
+        #searchStatus { min-height: 2.5em; margin: 8px 0; overflow-wrap: anywhere; }
+        #searchStatus.error { color: #a12622; }
+        #jobResults td { vertical-align: top; }
+        .job-meta { display: block; font-size: 12px; color: #555555; margin-top: 6px; }
+        .portal-status { display: block; font-size: 13px; font-weight: normal; margin-top: 8px; color: #555555; }
+        .portal-status[data-state="partial"] { color: #805500; }
+        .portal-status[data-state="unavailable"] { color: #a12622; }
+        .portal-status[data-state="searched"] { color: #196b45; }
+        #portalDetails { border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        #portalDetails summary { cursor: pointer; font-weight: bold; padding: 6px 0; }
+        #settingsDetails { border-top: 1px solid #e2e8f0; padding: 14px 0; }
+        #settingsDetails summary { cursor: pointer; font-weight: bold; }
+        .settings-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 18px; }
+        .settings-form label { display: flex; flex: 1 1 170px; min-width: 0; flex-direction: column; gap: 6px; font-size: 14px; }
+        .settings-form input { box-sizing: border-box; width: 100%; min-width: 0; padding: 10px; font: inherit; border: 2px solid #cbd5e1; border-radius: 6px; }
+        .settings-form .url-field { flex-basis: 300px; }
+        .icon-button { display: inline-flex; flex: 0 0 36px; width: 36px; height: 36px; padding: 8px; align-items: center; justify-content: center; border-radius: 6px; }
+        .icon-button svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .keyword-list { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .keyword-token { display: inline-flex; max-width: 100%; min-width: 0; align-items: center; border: 1px solid #e2e8f0; border-radius: 6px; background: #edf2f7; }
+        .keyword-token .tag { margin: 0; border: 0; border-radius: 6px; overflow-wrap: anywhere; min-width: 0; }
+        .keyword-token .icon-button { width: 30px; height: 32px; flex-basis: 30px; }
+        .settings-message, #storageStatus, #sessionNote { font-size: 13px; color: #555555; overflow-wrap: anywhere; }
+        .settings-message { min-height: 1.25em; margin: 8px 0; }
+        .settings-message.error, #storageStatus.error { color: #a12622; }
+        #jobTable td { overflow-wrap: anywhere; vertical-align: top; }
+        button:focus-visible, summary:focus-visible { outline: 2px solid #1a365d; outline-offset: 3px; }
+        [hidden] { display: none !important; }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 18px 14px; }
+            h1 { font-size: 25px; }
+            .search-box input { flex-basis: 100%; }
+            .search-box button { flex: 1; padding: 12px; }
+            th, td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>UK Career Job Board Search Hub</h1>
+    <p class="subtitle">Live vacancies across your company career portals</p>
+    <form class="search-box" id="searchForm">
+        <label for="searchInput">Job keyword</label>
+        <input type="text" id="searchInput" placeholder="MATLAB, Simulink, embedded software..." maxlength="120" required autocomplete="off">
+        <button type="submit" id="searchButton">Search Openings</button>
+        <button type="button" class="secondary" id="stopButton" hidden>Stop</button>
+    </form>
+    <div class="tags-container">
+        <div class="tags-title">Quick Keywords:</div>
+        <div class="keyword-list" id="keywordList"></div>
+    </div>
+    <details id="settingsDetails">
+        <summary>Manage Companies</summary>
+        <form id="companyForm" class="settings-form">
+            <label>Company name<input type="text" id="companyName" maxlength="100" required autocomplete="organization"></label>
+            <label class="url-field">Career portal URL<input type="url" id="companyUrl" placeholder="https://careers.example.com/jobs" maxlength="2048" required></label>
+            <button type="submit" class="icon-button" aria-label="Add company" title="Add company"><i data-lucide="plus" aria-hidden="true"></i></button>
+        </form>
+        <p id="companyMessage" class="settings-message" role="status"></p>
+    </details>
+    <p id="storageStatus" role="status">Local session</p>
+    <p class="coverage-note">Coverage is limited to accessible portal data. Partial or unavailable checks may miss vacancies. Indexed-search results can include expired jobs and are not verified openings. Saved portal location filters are retained where supported; external indexed searches may include other locations.</p>
+    <section id="liveResults" aria-labelledby="liveHeading" aria-busy="false">
+        <h2 id="liveHeading">Matching Openings <span id="jobCount">(0)</span></h2>
+        <p id="searchStatus" role="status" aria-live="polite">Ready to search.</p>
+        <p id="sessionNote" hidden></p>
+        <div class="table-scroll" id="jobsTableWrap" hidden>
+            <table>
+                <thead><tr><th>Company</th><th>Position</th><th>Location</th><th>Vacancy</th></tr></thead>
+                <tbody id="jobResults"></tbody>
+            </table>
+        </div>
+    </section>
+    <details id="portalDetails" open>
+        <summary id="resultCount">Company Portals &amp; Coverage (39)</summary>
+    <div class="results-section">
+        <div class="table-scroll">
+        <table id="jobTable">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Company / Portal</th>
+                    <th style="width: 60%;">Direct Career Link</th>
+                    <th style="width: 10%;">Manage</th>
+                </tr>
+            </thead>
+            <tbody id="jobTableBody">
+                <tr><td><strong>Actalent</strong></td><td><a class="job-link" href="https://careers.actalentservices.com/in/en/search-results" target="_blank">https://careers.actalentservices.com/in/en/search-results</a></td></tr>
+                <tr><td><strong>Satyam Venture</strong></td><td><a class="job-link" href="https://satyamventure.com/careers/current-openings/" target="_blank">https://satyamventure.com/careers/current-openings/</a></td></tr>
+                <tr><td><strong>JCB</strong></td><td><a class="job-link" href="https://careers.jcb.com/search" target="_blank">https://careers.jcb.com/search</a></td></tr>
+                <tr><td><strong>CNH Industrial</strong></td><td><a class="job-link" href="https://join.cnh.com/" target="_blank">https://join.cnh.com/</a></td></tr>
+                <tr><td><strong>Sonalika</strong></td><td><a class="job-link" href="https://www.sonalika.com/careers.html" target="_blank">https://www.sonalika.com/careers.html</a></td></tr>
+                <tr><td><strong>Caterpillar</strong></td><td><a class="job-link" href="https://careers.caterpillar.com/en/jobs/?searchTerm=&country=India&utm_content=701az00000b2mofqay_brand_ap_2026_hr_brand_a_c_jan26_c433_701az00000b2wyfqaa&utm_source=google&utm_medium=cpc&utm_campaign=701az00000b2mofqay_brand_ap_2026_hr_brand_a_c_jan26_c433_701az00000b2wyfqaa&utm_term=students_grads&utm_source=google&utm_medium=cpc&utm_campaign=701az00000b2mofqay_brand_ap_2026_hr_brand_a_c_jan26_c433_701aZ00000b2wyfQAA&utm_content=701az00000b2mofqay_brand_ap_2026_hr_brand_a_c_jan26_c433_701aZ00000b2wyfQAA&utm_keyword=&gad_source=1&gad_campaignid=23374030293&gbraid=0AAAAABNhY--5BZ3_TfReRhCdRWS2qE39V&gclid=CjwKCAjwpqHTBhAcEiwAj2AfujVPvgjmgExYxx4KKfhzbD4_7Lryx0KzJdX1FzhMMXAA5UUX8fMZXhoCO1oQAvD_BwE" target="_blank">https://careers.caterpillar.com/en/jobs/?searchTerm=&country=India...</a></td></tr>
+                <tr><td><strong>Mahindra Careers</strong></td><td><a class="job-link" href="https://jobs.mahindracareers.com/" target="_blank">https://jobs.mahindracareers.com/</a></td></tr>
+                <tr><td><strong>Escorts Kubota</strong></td><td><a class="job-link" href="https://www.escortskubota.com/search?searchWord=devloper&searchPhrase=all" target="_blank">https://www.escortskubota.com/search?searchWord=devloper&searchPhrase=all</a></td></tr>
+                <tr><td><strong>Liebherr</strong></td><td><a class="job-link" href="https://www.liebherr.com/en-in/careers/job-vacancies-4197876?filter=2569257846&ps=100" target="_blank">https://www.liebherr.com/en-in/careers/job-vacancies-4197876?filter=2569257846&ps=100</a></td></tr>
+                <tr><td><strong>Palfinger</strong></td><td><a class="job-link" href="https://www.palfinger.com/worldwide/en/career/jobs.html?country=india&city=&area=" target="_blank">https://www.palfinger.com/worldwide/en/career/jobs.html?country=india&city=&area=</a></td></tr>
+                <tr><td><strong>Sasken</strong></td><td><a class="job-link" href="https://careers.sasken.com/tb/saskenjobs/india" target="_blank">https://careers.sasken.com/tb/saskenjobs/india</a></td></tr>
+                <tr><td><strong>Rockwell Automation</strong></td><td><a class="job-link" href="https://rockwellautomation.wd1.myworkdayjobs.com/en-US/External_Rockwell_Automation?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e&timeType=6e71e0aa4124010e18da383114095a00&jobFamilyGroup=9dab781c832601d0571416d4ba02f519&jobFamilyGroup=9dab781c832601a3ebe416d4ba02fb19&jobFamilyGroup=9dab781c8326017fe75716d4ba02f719&jobFamilyGroup=9dab781c8326014b712915d4ba02ef19" target="_blank">Rockwell Automation Workday Link</a></td></tr>
+                <tr><td><strong>Schneider Electric</strong></td><td><a class="job-link" href="https://careers.se.com/jobs?lang=en-US&location=India&woe=12&regionCode=IN&stretchUnit=MILES&stretch=10&page=1&keywords=matlab&sortBy=relevance" target="_blank">https://careers.se.com/jobs?lang=en-US&location=India&keywords=matlab...</a></td></tr>
+                <tr><td><strong>KUKA</strong></td><td><a class="job-link" href="https://www.kuka.com/en-de/company/careers" target="_blank">https://www.kuka.com/en-de/company/careers</a></td></tr>
+                <tr><td><strong>Continental</strong></td><td><a class="job-link" href="https://jobs.continental.com/en/#/?searchTerm=matlab&location=%7B%22title%22:%22Indian%20Institute%20of%20Information%20Technology,%20Pune,%20Maharashtra,%20India%22,%22type%22:%22location%22,%22coordinates%22:%7B%22latitude%22:18.7651,%22longitude%22:73.697%7D%7D" target="_blank">https://jobs.continental.com/en/#/?searchTerm=matlab...</a></td></tr>
+                <tr><td><strong>Tata Elxsi</strong></td><td><a class="job-link" href="https://www.tataelxsi.com/careers/job-openings?page=1" target="_blank">https://www.tataelxsi.com/careers/job-openings?page=1</a></td></tr>
+                <tr><td><strong>LTIMindtree</strong></td><td><a class="job-link" href="https://ltimindtree.ripplehire.com/candidate/?token=xviyQvbnyYZdGtozXoNm&lang=en&source=CAREERSITE#" target="_blank">https://ltimindtree.ripplehire.com/candidate/?token=xviyQvbnyYZdGtozXoNm</a></td></tr>
+                <tr><td><strong>KPIT</strong></td><td><a class="job-link" href="https://www.kpit.com/job-listing/?country=India&location&exp=6&show_all=1" target="_blank">https://www.kpit.com/job-listing/?country=India&location&exp=6&show_all=1</a></td></tr>
+                <tr><td><strong>Bosch</strong></td><td><a class="job-link" href="https://jobs.bosch.com/en/?country=in&searchTerm=Software+Developer&pages=1#" target="_blank">https://jobs.bosch.com/en/?country=in&searchTerm=Software+Developer&pages=1#</a></td></tr>
+                <tr><td><strong>Accenture</strong></td><td><a class="job-link" href="https://www.accenture.com/us-en/careers/jobsearch" target="_blank">https://www.accenture.com/us-en/careers/jobsearch</a></td></tr>
+                <tr><td><strong>TCS iBegin</strong></td><td><a class="job-link" href="https://ibegin.tcsapps.com/candidate/next/register" target="_blank">https://ibegin.tcsapps.com/candidate/next/register</a></td></tr>
+                <tr><td><strong>Tata Careers</strong></td><td><a class="job-link" href="https://www.tata.com/careers/jobs/joblisting" target="_blank">https://www.tata.com/careers/jobs/joblisting</a></td></tr>
+                <tr><td><strong>Avern Systems</strong></td><td><a class="job-link" href="https://www.avinsystems.com/careers/" target="_blank">https://www.avinsystems.com/careers/</a></td></tr>
+                <tr><td><strong>Marquardt</strong></td><td><a class="job-link" href="https://www.marquardt.com/careers/job-search/page?tx_tt3career_careerlist%5B__referrer%5D..." target="_blank">Marquardt Career Link with Filters</a></td></tr>
+                <tr><td><strong>Sany India</strong></td><td><a class="job-link" href="https://www.sany.in/careers/current-openings/" target="_blank">https://www.sany.in/careers/current-openings/</a></td></tr>
+                <tr><td><strong>Knorr-Bremse</strong></td><td><a class="job-link" href="https://careers.knorr-bremse.com/default/content/search/?locale=en_US&keyword=developer&addresses%2Fcountry=India" target="_blank">https://careers.knorr-bremse.com/default/content/search/...</a></td></tr>
+                <tr><td><strong>Yanmar</strong></td><td><a class="job-link" href="https://www.yanmar.com/global/career/jobs/?country=india" target="_blank">https://www.yanmar.com/global/career/jobs/?country=india</a></td></tr>
+                <tr><td><strong>Trimble</strong></td><td><a class="job-link" href="https://trimblecareers.trimble.com/careers?query=MATLAB&start=0&pid=171838458676&sort_by=relevance" target="_blank">https://trimblecareers.trimble.com/careers?query=MATLAB...</a></td></tr>
+                <tr><td><strong>CLAAS</strong></td><td><a class="job-link" href="https://recruiting.claas.com/?utm_source=careersite/&locale=en_US" target="_blank">https://recruiting.claas.com/?utm_source=careersite/&locale=en_US</a></td></tr>
+                <tr><td><strong>Cummins</strong></td><td><a class="job-link" href="https://cummins-veterans.jobs/jobs/?q=matlab" target="_blank">https://cummins-veterans.jobs/jobs/?q=matlab</a></td></tr>
+                <tr><td><strong>ZF Group</strong></td><td><a class="job-link" href="https://jobs.zf.com/search/?createNewAlert=false&q=matlab%2C+Simulink%2C+MBD%2C+Embedded%2C+MBSD&optionsFacetsDD_facility=&optionsFacetsDD_shifttype=&optionsFacetsDD_country=IN" target="_blank">https://jobs.zf.com/search/?q=matlab, Simulink...</a></td></tr>
+                <tr><td><strong>Eaton</strong></td><td><a class="job-link" href="https://eaton.eightfold.ai/careers?start=0&pid=687236602332&sort_by=match" target="_blank">https://eaton.eightfold.ai/careers?start=0&pid=687236602332</a></td></tr>
+                <tr><td><strong>Mercedes-Benz</strong></td><td><a class="job-link" href="https://jobs.mercedes-benz.com/en?en%3FTargetGroup.Code=4&PositionFormattedDescription.Content=%22matlab%22&PositionLocation.Country=%5B390%5D" target="_blank">https://jobs.mercedes-benz.com/en?position=matlab</a></td></tr>
+                <tr><td><strong>Volvo Group</strong></td><td><a class="job-link" href="https://jobs.volvogroup.com/?locale=en_US" target="_blank">https://jobs.volvogroup.com/?locale=en_US</a></td></tr>
+                <tr><td><strong>RNTBCI</strong></td><td><a class="job-link" href="https://rntbci.in/careers" target="_blank">https://rntbci.in/careers</a></td></tr>
+                <tr><td><strong>Cognizant</strong></td><td><a class="job-link" href="https://careers.cognizant.com/india-en/jobs/00069797301/plant-model-engineer-mbsd/" target="_blank">https://careers.cognizant.com/india-en/jobs/00069797301/plant-model-engineer-mbsd/</a></td></tr>
+                <tr><td><strong>Hella</strong></td><td><a class="job-link" href="https://hella.csod.com/ux/ats/careersite/3/home?c=hella&country=in&lang=en-US" target="_blank">https://hella.csod.com/ux/ats/careersite/3/home?c=hella</a></td></tr>
+                <tr><td><strong>Bajaj Auto</strong></td><td><a class="job-link" href="https://careers.bajajauto.com/search/?createNewAlert=false&q=matlab&locationsearch=" target="_blank">https://careers.bajajauto.com/search/?q=matlab</a></td></tr>
+                <tr><td><strong>Harman</strong></td><td><a class="job-link" href="https://jobsearch.harman.com/en_US/careers/SearchJobs?listFilterMode=1&jobRecordsPerPage=20&" target="_blank">https://jobsearch.harman.com/en_US/careers/SearchJobs</a></td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    </details>
+</div>
+
+<script src="/lucide.js"></script>
+<script>
+const searchInput = document.getElementById('searchInput');
+const searchStatus = document.getElementById('searchStatus');
+const stopButton = document.getElementById('stopButton');
+const portalRows = new Map();
+const SETTINGS_KEY = 'ukCareerJobHub.settings.v1';
+const SESSION_KEY = 'ukCareerJobHub.session.v1';
+const defaultCompanies = Array.from(document.querySelectorAll('#jobTableBody tr'), row => ({
+    company: row.querySelector('strong').textContent.trim(), url: row.querySelector('a').href
+}));
+let companies = defaultCompanies;
+let keywords = ['matlab', 'simulink', 'developer', 'embedded'];
+let lastSession = null;
+let activeSearch = null;
+let debounceTimer;
+
+function showIcons() {
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function portalUrl(value) {
+    let url;
+    try { url = new URL(value); } catch { throw new Error('Enter a valid public HTTPS career URL.'); }
+    const hostname = url.hostname.replace(/\.$/, '').toLowerCase();
+    if (value.length > 2048 || url.protocol !== 'https:' || url.username || url.password || url.port ||
+        !hostname.includes('.') || /^\d+\.\d+\.\d+\.\d+$/.test(hostname) || hostname.startsWith('[') ||
+        /(?:^|\.)(?:localhost|local|internal|test|invalid)$/.test(hostname)) {
+        throw new Error('Use a public HTTPS domain without credentials or a custom port.');
+    }
+    return url.href;
+}
+
+function storageFailure(message) {
+    const status = document.getElementById('storageStatus');
+    status.className = 'error';
+    status.textContent = message;
+}
+
+function saveSettings() {
+    try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ version: 1, companies, keywords,
+            query: searchInput.value, portalOpen: document.getElementById('portalDetails').open,
+            settingsOpen: document.getElementById('settingsDetails').open }));
+        const status = document.getElementById('storageStatus');
+        status.className = '';
+        status.textContent = 'Saved locally at ' + new Date().toLocaleTimeString();
+    } catch { storageFailure('Browser storage is unavailable or full. Changes will not survive closing this page.'); }
+}
+
+function saveSession(state) {
+    try {
+        if (!lastSession) { localStorage.removeItem(SESSION_KEY); return; }
+        lastSession.state = state || lastSession.state;
+        lastSession.summary = searchStatus.textContent;
+        lastSession.updatedAt = new Date().toISOString();
+        lastSession.statuses = Array.from(portalRows, ([company, status]) => ({
+            company, state: status.dataset.state || '', text: status.textContent
+        }));
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ ...lastSession,
+            jobs: lastSession.jobs.slice(0, 1000), totalJobs: lastSession.jobs.length }));
+    } catch { storageFailure('Settings may be saved, but the latest search results could not be saved in this browser.'); }
+}
+
+function iconButton(label, icon, action) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'icon-button secondary';
+    button.title = label;
+    button.setAttribute('aria-label', label);
+    const image = document.createElement('i');
+    image.dataset.lucide = icon;
+    image.setAttribute('aria-hidden', 'true');
+    button.append(image);
+    button.addEventListener('click', action);
+    return button;
+}
+
+function renderKeywords() {
+    const list = document.getElementById('keywordList');
+    list.replaceChildren();
+    keywords.forEach(keyword => {
+        const token = document.createElement('span');
+        token.className = 'keyword-token';
+        const search = document.createElement('button');
+        search.type = 'button';
+        search.className = 'tag';
+        search.textContent = keyword;
+        search.addEventListener('click', () => setKeyword(keyword));
+        token.append(search, iconButton('Remove keyword ' + keyword, 'x', () => {
+            keywords = keywords.filter(value => value !== keyword);
+            renderKeywords();
+            saveSettings();
+        }));
+        list.append(token);
+    });
+    list.append(iconButton('Clear search', 'eraser', clearSearch));
+    showIcons();
+}
+
+function parseSearchKeywords(value) {
+    const unique = new Map();
+    for (const entry of value.normalize('NFKC').split(',')) {
+        const keyword = entry.trim().replace(/\s+/g, ' ');
+        if (keyword && !unique.has(keyword.toLowerCase())) unique.set(keyword.toLowerCase(), keyword);
+    }
+    if (!unique.size) throw new Error('Enter at least one non-empty keyword.');
+    if (unique.size > 10) throw new Error('Search at most 10 comma-separated keywords at a time.');
+    return [...unique.values()];
+}
+
+function rememberSearchKeywords(terms) {
+    const recent = new Map(keywords.map(keyword => [keyword.normalize('NFKC').toLowerCase(), keyword]));
+    terms.forEach(term => {
+        const key = term.toLowerCase();
+        const existing = recent.get(key);
+        recent.delete(key);
+        recent.set(key, existing || term);
+    });
+    keywords = [...recent.values()].slice(-50);
+    renderKeywords();
+    saveSettings();
+}
+
+function updateDiscoveryLinks() {
+    let terms = [];
+    try { terms = parseSearchKeywords(searchInput.value); } catch {}
+    const keywordsQuery = terms.length ? ' (' + terms.map(term => '"' + term.replace(/"/g, '') + '"').join(' OR ') + ')' : ' (jobs OR careers)';
+    companies.forEach(source => {
+        const link = portalRows.get(source.company)?.closest('tr').querySelector('.discovery-link');
+        if (!link) return;
+        const target = new URL('https://www.google.com/search');
+        target.searchParams.set('q', 'site:' + new URL(source.url).hostname + keywordsQuery);
+        link.href = target.href;
+    });
+}
+
+function renderCompanies() {
+    const body = document.getElementById('jobTableBody');
+    body.replaceChildren();
+    portalRows.clear();
+    companies.forEach(source => {
+        const row = document.createElement('tr');
+        const companyCell = document.createElement('td');
+        const name = document.createElement('strong');
+        name.textContent = source.company;
+        const status = document.createElement('span');
+        status.className = 'portal-status';
+        status.textContent = 'Not checked';
+        companyCell.append(name, status);
+        portalRows.set(source.company, status);
+        const linkCell = document.createElement('td');
+        const link = document.createElement('a');
+        link.className = 'job-link';
+        link.href = source.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = source.url;
+        const discovery = document.createElement('a');
+        discovery.className = 'discovery-link';
+        discovery.target = '_blank';
+        discovery.rel = 'noopener noreferrer';
+        discovery.textContent = 'Search indexed listings';
+        discovery.title = 'External search for ' + source.company + '; results may include expired or unrelated pages';
+        linkCell.append(link, discovery);
+        const actions = document.createElement('td');
+        actions.append(iconButton('Remove company ' + source.company, 'trash-2', () => {
+            stopSearch();
+            companies = companies.filter(company => company !== source);
+            companiesChanged();
+            document.getElementById('companyMessage').textContent = source.company + ' removed.';
+        }));
+        row.append(companyCell, linkCell, actions);
+        body.append(row);
+    });
+    document.getElementById('resultCount').textContent = 'Company Portals & Coverage (' + companies.length + ')';
+    updateDiscoveryLinks();
+    showIcons();
+}
+
+function companiesChanged() {
+    stopSearch();
+    lastSession = null;
+    renderCompanies();
+    resetResults();
+    searchStatus.textContent = companies.length ? 'Company list updated. Results need a new search.' : 'No companies configured.';
+    saveSettings();
+    saveSession();
+}
+
+function restoreSettings() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
+        if (!saved) return;
+        if (saved.version !== 1 || !Array.isArray(saved.companies) || saved.companies.length > 100 ||
+            !Array.isArray(saved.keywords) || saved.keywords.length > 50) throw new Error('Invalid settings');
+        const names = new Set();
+        const urls = new Set();
+        const restoredCompanies = saved.companies.map(source => {
+            if (!source || typeof source.company !== 'string' || !source.company.trim() || source.company.length > 100) throw new Error('Invalid company');
+            const company = source.company.trim();
+            const url = portalUrl(source.url);
+            if (names.has(company.toLowerCase()) || urls.has(url)) throw new Error('Duplicate company');
+            names.add(company.toLowerCase());
+            urls.add(url);
+            return { company, url };
+        });
+        const restoredKeywords = saved.keywords.map(keyword => {
+            if (typeof keyword !== 'string' || !keyword.trim() || keyword.length > 120) throw new Error('Invalid keyword');
+            return keyword.trim();
+        });
+        if (new Set(restoredKeywords.map(keyword => keyword.toLowerCase())).size !== restoredKeywords.length) throw new Error('Duplicate keyword');
+        companies = restoredCompanies;
+        keywords = restoredKeywords;
+        searchInput.value = typeof saved.query === 'string' ? saved.query.slice(0, 120) : '';
+        document.getElementById('portalDetails').open = saved.portalOpen !== false;
+        document.getElementById('settingsDetails').open = saved.settingsOpen === true;
+        document.getElementById('storageStatus').textContent = 'Previous settings restored';
+    } catch { storageFailure('Saved settings could not be restored. Default settings are shown.'); }
+}
+
+function setBusy(busy) {
+    document.getElementById('liveResults').setAttribute('aria-busy', String(busy));
+    stopButton.hidden = !busy;
+    document.getElementById('searchButton').textContent = busy ? 'Search Again' : 'Search Openings';
+}
+
+function stopSearch() {
+    clearTimeout(debounceTimer);
+    if (!activeSearch) return;
+    activeSearch.abort();
+    activeSearch = null;
+    setBusy(false);
+    portalRows.forEach(status => {
+        if (status.dataset.state === 'pending') {
+            status.dataset.state = 'stopped';
+            status.textContent = 'Not checked - search stopped';
+        }
+    });
+    searchStatus.textContent = 'Search stopped. Results already retrieved are shown.';
+    saveSession('stopped');
+}
+
+function appendJobs(jobs, seen) {
+    const body = document.getElementById('jobResults');
+    const added = [];
+    jobs.forEach(job => {
+        if (!job || typeof job.url !== 'string' || typeof job.title !== 'string' || !portalRows.has(job.company)) return;
+        let url;
+        try { url = new URL(job.url); } catch { return; }
+        if (url.protocol !== 'https:' || url.username || url.password || seen.has(url.href)) return;
+        seen.add(url.href);
+        added.push(job);
+        const row = document.createElement('tr');
+        [job.company, job.title, job.location].forEach(value => {
+            const cell = document.createElement('td');
+            cell.textContent = value || 'Not specified';
+            row.append(cell);
+        });
+        const cell = document.createElement('td');
+        const link = document.createElement('a');
+        link.className = 'job-link';
+        link.href = url.href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'View opening';
+        const metadata = document.createElement('span');
+        metadata.className = 'job-meta';
+        metadata.textContent = job.evidence || 'Portal listing';
+        cell.append(link, metadata);
+        row.append(cell);
+        body.append(row);
+    });
+    document.getElementById('jobCount').textContent = '(' + seen.size + ')';
+    document.getElementById('jobsTableWrap').hidden = seen.size === 0;
+    return added;
+}
+
+function resetResults() {
+    document.getElementById('jobResults').replaceChildren();
+    document.getElementById('jobCount').textContent = '(0)';
+    document.getElementById('jobsTableWrap').hidden = true;
+    document.getElementById('sessionNote').hidden = true;
+    searchStatus.className = '';
+}
+
+function restoreSession() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+        if (!saved || saved.version !== 1 || saved.companyKey !== JSON.stringify(companies)) return;
+        if (!Array.isArray(saved.jobs) || saved.jobs.length > 1000 || !Array.isArray(saved.statuses) ||
+            saved.statuses.length > 100 || typeof saved.keyword !== 'string' || saved.keyword.length > 120 ||
+            !Number.isFinite(Date.parse(saved.updatedAt))) throw new Error('Invalid session');
+        const restoredJobs = appendJobs(saved.jobs, new Set());
+        lastSession = { ...saved, jobs: restoredJobs };
+        saved.statuses.forEach(item => {
+            const status = portalRows.get(item.company);
+            if (!status || typeof item.text !== 'string') return;
+            status.dataset.state = ['partial', 'searched', 'unavailable'].includes(item.state) ? item.state : 'stopped';
+            status.textContent = item.state === 'pending' ? 'Not checked - previous search interrupted' : item.text;
+        });
+        searchStatus.textContent = 'Previous search for "' + saved.keyword + '": ' + restoredJobs.length + ' saved openings.';
+        const note = document.getElementById('sessionNote');
+        note.hidden = false;
+        note.textContent = 'Saved ' + new Date(saved.updatedAt).toLocaleString() + '. Not refreshed.' +
+            (saved.totalJobs > restoredJobs.length ? ' Only the first 1,000 results are retained.' : '') +
+            (saved.state !== 'complete' ? ' Previous search was incomplete.' : '');
+    } catch { storageFailure('Settings were restored, but the previous search results could not be restored.'); }
+}
+
+async function searchJobs() {
+    clearTimeout(debounceTimer);
+    const query = searchInput.value.trim();
+    if (!query) { clearSearch(); return; }
+    stopSearch();
+    saveSettings();
+    searchStatus.className = '';
+    let terms;
+    try { terms = parseSearchKeywords(query); } catch (error) {
+        searchStatus.className = 'error';
+        searchStatus.textContent = error.message;
+        return;
+    }
+    const keyword = terms.join(', ');
+    if (!companies.length) {
+        searchStatus.textContent = 'No companies configured.';
+        return;
+    }
+    if (location.protocol === 'file:') {
+        searchStatus.className = 'error';
+        searchStatus.textContent = 'Live search requires the local backend. Open the localhost URL printed by the server.';
+        return;
+    }
+    rememberSearchKeywords(terms);
+    updateDiscoveryLinks();
+    const controller = new AbortController();
+    activeSearch = controller;
+    const seen = new Set();
+    let checked = 0;
+    let total = portalRows.size;
+    let partial = 0;
+    let unavailable = 0;
+    let completed = false;
+    let failureMessage = 'Live search could not finish. The service may be unavailable or waking from idle. Retrieved results are retained; unchecked portals are listed below.';
+    resetResults();
+    lastSession = { version: 1, keyword, companyKey: JSON.stringify(companies), jobs: [], state: 'running' };
+    portalRows.forEach(status => {
+        status.dataset.state = 'pending';
+        status.textContent = 'Waiting for check';
+    });
+    setBusy(true);
+    const summary = () => checked + '/' + total + ' portals checked for "' + keyword + '". ' +
+        seen.size + ' matching openings. ' + partial + ' partial checks; ' + unavailable + ' unavailable.';
+    searchStatus.textContent = summary();
+    saveSession('running');
+    function handleEvent(event) {
+        if (event.type === 'start') total = event.total;
+        if (event.type === 'source') {
+            checked++;
+            if (event.status === 'partial') partial++;
+            if (event.status === 'unavailable') unavailable++;
+            const status = portalRows.get(event.company);
+            if (status) {
+                status.dataset.state = event.status;
+                status.textContent = event.jobs.length + ' matches. ' + event.message;
+            }
+            lastSession.jobs.push(...appendJobs(event.jobs, seen));
+        }
+        if (event.type === 'done') completed = true;
+        searchStatus.textContent = summary();
+        saveSession(event.type === 'done' ? 'complete' : 'running');
+    }
+    try {
+        const response = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keyword, sources: companies }), signal: controller.signal });
+        if (response.status === 429) {
+            const retryAfter = Math.min(60, Math.max(1, Number(response.headers.get('Retry-After')) || 15));
+            failureMessage = 'Search capacity is busy. Please try again after ' + retryAfter + ' seconds.';
+            throw new Error('Search capacity limit');
+        }
+        if (!response.ok || !response.body) throw new Error('Backend response failed');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let pending = '';
+        while (true) {
+            const chunk = await reader.read();
+            if (activeSearch !== controller) return;
+            pending += decoder.decode(chunk.value, { stream: !chunk.done });
+            const lines = pending.split('\n');
+            pending = lines.pop();
+            lines.filter(line => line.trim()).forEach(line => handleEvent(JSON.parse(line)));
+            if (chunk.done) break;
+        }
+        if (pending.trim()) handleEvent(JSON.parse(pending));
+        if (!completed) throw new Error('Search connection interrupted');
+        searchStatus.textContent = summary() + (seen.size ? '' :
+            ' No verified matches retrieved; check portal coverage below.') +
+            ' Checked at ' + new Date().toLocaleTimeString() + '.';
+        saveSession('complete');
+    } catch (error) {
+        if (activeSearch !== controller) return;
+        controller.abort();
+        searchStatus.className = 'error';
+        searchStatus.textContent = failureMessage;
+        portalRows.forEach(status => {
+            if (status.dataset.state === 'pending') {
+                status.dataset.state = 'unavailable';
+                status.textContent = 'Not checked - connection interrupted';
+            }
+        });
+        saveSession('error');
+    } finally {
+        if (activeSearch === controller) {
+            activeSearch = null;
+            setBusy(false);
+        }
+    }
+}
+
+function setKeyword(keyword) {
+    searchInput.value = keyword;
+    searchJobs();
+}
+
+function clearSearch() {
+    stopSearch();
+    searchInput.value = '';
+    updateDiscoveryLinks();
+    resetResults();
+    lastSession = null;
+    searchStatus.textContent = 'Ready to search.';
+    portalRows.forEach(status => {
+        status.dataset.state = '';
+        status.textContent = 'Not checked';
+    });
+    saveSettings();
+    saveSession();
+}
+
+document.getElementById('companyForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const message = document.getElementById('companyMessage');
+    message.classList.remove('error');
+    try {
+        const company = document.getElementById('companyName').value.trim();
+        const url = portalUrl(document.getElementById('companyUrl').value.trim());
+        if (!company) throw new Error('Enter a company name.');
+        if (companies.length >= 100) throw new Error('A maximum of 100 companies can be saved.');
+        if (companies.some(source => source.company.toLowerCase() === company.toLowerCase() || source.url === url)) {
+            throw new Error('That company name or portal URL is already saved.');
+        }
+        companies = [...companies, { company, url }];
+        companiesChanged();
+        event.target.reset();
+        message.textContent = company + ' added.';
+    } catch (error) { message.classList.add('error'); message.textContent = error.message; }
+});
+
+document.getElementById('searchForm').addEventListener('submit', event => {
+    event.preventDefault();
+    searchJobs();
+});
+searchInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    stopSearch();
+    saveSettings();
+    if (!searchInput.value.trim()) clearSearch();
+    else debounceTimer = setTimeout(searchJobs, 900);
+});
+stopButton.addEventListener('click', stopSearch);
+restoreSettings();
+renderCompanies();
+renderKeywords();
+restoreSession();
+document.getElementById('portalDetails').addEventListener('toggle', saveSettings);
+document.getElementById('settingsDetails').addEventListener('toggle', saveSettings);
+window.addEventListener('pagehide', () => { stopSearch(); saveSettings(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "local-career-search",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test server.test.cjs"
+  },
+  "engines": { "node": ">=20.8" },
+  "dependencies": { "cheerio": "1.0.0", "lucide": "^0.468.0", "undici": "^6.21.3" }
+}

@@ -1,0 +1,17 @@
+{
+  "services": [
+    {
+      "type": "web",
+      "name": "uk-career-job-hub",
+      "runtime": "node",
+      "plan": "free",
+      "buildCommand": "npm ci --prefix job_hub_backend",
+      "startCommand": "node job_hub_backend/server.cjs",
+      "healthCheckPath": "/healthz",
+      "envVars": [
+        { "key": "NODE_VERSION", "value": "22" },
+        { "key": "NODE_ENV", "value": "production" }
+      ]
+    }
+  ]
+}
